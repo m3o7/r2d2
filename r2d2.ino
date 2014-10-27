@@ -1,40 +1,175 @@
-/*
-http://arduino.cc/en/Reference/analogWrite
-*/
+/*LIBRARY*/
 
-#define SPEAKER_PIN 13
-#define WHITE_LED 12
-#define RED_LED 11
-#define BLUE_LED 10
+#ifndef ARDPRINTF
+#define ARDPRINTF
+#define ARDBUFFER 16
+#include <stdarg.h>
+#include <Arduino.h>
+
+int ardprintf(char *str, ...)
+{
+  int i, count=0, j=0, flag=0;
+  char temp[ARDBUFFER+1];
+  for(i=0; str[i]!='\0';i++)  if(str[i]=='%')  count++;
+
+  va_list argv;
+  va_start(argv, count);
+  for(i=0,j=0; str[i]!='\0';i++)
+  {
+    if(str[i]=='%')
+    {
+      temp[j] = '\0';
+      Serial.print(temp);
+      j=0;
+      temp[0] = '\0';
+
+      switch(str[++i])
+      {
+        case 'd': Serial.print(va_arg(argv, int));
+                  break;
+        case 'l': Serial.print(va_arg(argv, long));
+                  break;
+        case 'f': Serial.print(va_arg(argv, double));
+                  break;
+        case 'c': Serial.print((char)va_arg(argv, int));
+                  break;
+        case 's': Serial.print(va_arg(argv, char *));
+                  break;
+        default:  ;
+      };
+    }
+    else 
+    {
+      temp[j] = str[i];
+      j = (j+1)%ARDBUFFER;
+      if(j==0) 
+      {
+        temp[ARDBUFFER] = '\0';
+        Serial.print(temp);
+        temp[0]='\0';
+      }
+    }
+  };
+  Serial.println();
+  return count + 1;
+}
+#undef ARDBUFFER
+#endif
+
+#define SPEAKER_PIN 6
+#define LED_WHITE 9
+#define LED_RED 8
+#define LED_BLUE 7
 
 // audio jack
-#define AJ_TIP 7 // always powered
-#define BLUE_BTN 6 
-#define RED_BTN 5 
-#define AJ_DO_NOT_USE 4 // its the "sleeve" pin from the audio-jack
+#define AJ_BTN_BLUE 13
+#define AJ_BTN_RED 12 
 
+// GLOBAL VARIABLES
+int BTN_BLUE = LOW;
+int BTN_BLUE_PREV = LOW;
+unsigned long BTN_BLUE_STARTED = 0; // time since a button press started
+bool BTN_BLUE_SHORT_PRESS = false; // true only for one run
+bool BTN_BLUE_MEDIUM_PRESS = false; // true only for one run
+bool BTN_BLUE_LONG_PRESS = false; // true only for one run
+
+int BTN_RED = LOW;
+int BTN_RED_PREV = LOW;
+unsigned long BTN_RED_STARTED = 0; // time since a button press started
+bool BTN_RED_SHORT_PRESS = false;
+bool BTN_RED_MEDIUM_PRESS = false;
+bool BTN_RED_LONG_PRESS = false;
+
+// define button press times
+unsigned long BTN_MEDIUM_LONG = 500;
+unsigned long BTN_LONG = 2000;
 
 void setup(){
     // DEBUG ONLY - communication with computer
     Serial.begin(9600);
 
     // sets LED pins for output
-    pinMode(WHITE_LED, OUTPUT);
-    pinMode(RED_LED, OUTPUT);
-    pinMode(BLUE_LED, OUTPUT);
+    pinMode(LED_WHITE, OUTPUT);
+    pinMode(LED_RED, OUTPUT);
+    pinMode(LED_BLUE, OUTPUT);
 
-    // 
+    // Audio-Jack controlled buttons
+    pinMode(AJ_BTN_BLUE, INPUT_PULLUP);
+    pinMode(AJ_BTN_RED, INPUT_PULLUP);
 }
-
 
 void loop(){
-    delay(100);
-    analogWrite(WHITE_LED, random(255));
-    analogWrite(RED_LED, random(255));
-    analogWrite(BLUE_LED, random(255));
+    delay(50);
+    read_buttons();    
 
-    // button pressed
-    if (false){
-        Serial.print("button is being pressed");
+    //print out the value of the pushbutton
+    if (BTN_BLUE_SHORT_PRESS || BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS){
+        ardprintf("blue: %d %d %d", BTN_BLUE_SHORT_PRESS, BTN_BLUE_MEDIUM_PRESS, BTN_BLUE_LONG_PRESS); // DEBUG ONLY
     }
+    if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
+        ardprintf("red: %d %d %d", BTN_RED_SHORT_PRESS, BTN_RED_MEDIUM_PRESS, BTN_RED_LONG_PRESS); // DEBUG ONLY
+    }
+
+    // control_leds();
 }
+
+void control_leds(){
+    // control lights
+    analogWrite(LED_WHITE, random(255));
+    analogWrite(LED_RED, random(255));
+    analogWrite(LED_BLUE, random(255));
+}
+
+void read_buttons(){
+    // clear old state
+    BTN_BLUE_SHORT_PRESS = false;
+    BTN_BLUE_MEDIUM_PRESS = false;
+    BTN_BLUE_LONG_PRESS = false;
+    BTN_RED_SHORT_PRESS = false;
+    BTN_RED_MEDIUM_PRESS = false;
+    BTN_RED_LONG_PRESS = false;
+
+    // read sensor values - http://arduino.cc/en/Tutorial/InputPullupSerial
+    BTN_BLUE = digitalRead(AJ_BTN_BLUE);
+    BTN_RED = digitalRead(AJ_BTN_RED);
+    // ardprintf("%d - %d", BTN_BLUE, BTN_RED); // DEBUG ONLY
+
+    // PRESS STARTED ===========================================================
+    /*BLUE BTN press finished*/
+    if (BTN_BLUE_PREV == HIGH && BTN_BLUE == LOW){ 
+        BTN_BLUE_STARTED = millis();
+    }
+
+    /*RED BTN press finished*/
+    if (BTN_RED_PREV == LOW && BTN_RED == HIGH){ 
+        BTN_RED_STARTED = millis();
+    }
+
+    // PRESS FINISHED ==========================================================
+    /*BLUE BTN press finished*/
+    if (BTN_BLUE_PREV == LOW && BTN_BLUE == HIGH){ 
+        if (millis() - BTN_BLUE_STARTED < BTN_MEDIUM_LONG){
+            BTN_BLUE_SHORT_PRESS = true;
+        } else if (millis() - BTN_BLUE_STARTED < BTN_LONG) {
+            BTN_BLUE_MEDIUM_PRESS = true;
+        } else {
+            BTN_BLUE_LONG_PRESS = true;
+        }
+    }
+
+    /*RED BTN press finished*/
+    if (BTN_RED_PREV == LOW && BTN_RED == HIGH){ 
+        if (millis() - BTN_RED_STARTED < BTN_MEDIUM_LONG){
+            BTN_RED_SHORT_PRESS = true;
+        } else if (millis() - BTN_RED_STARTED < BTN_LONG) {
+            BTN_RED_MEDIUM_PRESS = true;
+        } else {
+            BTN_RED_LONG_PRESS = true;
+        }
+    }
+
+    // assign values to old
+    BTN_BLUE_PREV = BTN_BLUE;
+    BTN_RED_PREV = BTN_RED;
+}
+
