@@ -56,7 +56,7 @@ int ardprintf(char *str, ...)
 #undef ARDBUFFER
 #endif
 
-#define SPEAKER_PIN 6
+#define SPEAKER_PIN 3
 #define LED_WHITE 9
 #define LED_RED 8
 #define LED_BLUE 7
@@ -133,39 +133,46 @@ void read_buttons(){
     BTN_BLUE = digitalRead(AJ_BTN_BLUE);
     BTN_RED = digitalRead(AJ_BTN_RED);
     // ardprintf("%d - %d", BTN_BLUE, BTN_RED); // DEBUG ONLY
+    unsigned long CURRENT_TIME = millis();
 
     // PRESS STARTED ===========================================================
     /*BLUE BTN press finished*/
     if (BTN_BLUE_PREV == HIGH && BTN_BLUE == LOW){ 
-        BTN_BLUE_STARTED = millis();
+        BTN_BLUE_STARTED = CURRENT_TIME;
+        ardprintf("BLUE start %l", BTN_BLUE_STARTED); // DEBUG ONLY
     }
 
     /*RED BTN press finished*/
     if (BTN_RED_PREV == LOW && BTN_RED == HIGH){ 
-        BTN_RED_STARTED = millis();
+        BTN_RED_STARTED = CURRENT_TIME;
+        ardprintf("RED start %l", BTN_RED_STARTED); // DEBUG ONLY
     }
 
     // PRESS FINISHED ==========================================================
     /*BLUE BTN press finished*/
-    if (BTN_BLUE_PREV == LOW && BTN_BLUE == HIGH){ 
-        if (millis() - BTN_BLUE_STARTED < BTN_MEDIUM_LONG){
+    if (BTN_BLUE_PREV == LOW && BTN_BLUE == HIGH){
+        unsigned long ELAPSED_TIME = CURRENT_TIME - BTN_BLUE_STARTED;
+        if (ELAPSED_TIME < BTN_MEDIUM_LONG){
             BTN_BLUE_SHORT_PRESS = true;
-        } else if (millis() - BTN_BLUE_STARTED < BTN_LONG) {
+        } else if (ELAPSED_TIME < BTN_LONG) {
             BTN_BLUE_MEDIUM_PRESS = true;
         } else {
             BTN_BLUE_LONG_PRESS = true;
         }
+        ardprintf("BLUE ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
     }
 
     /*RED BTN press finished*/
-    if (BTN_RED_PREV == LOW && BTN_RED == HIGH){ 
-        if (millis() - BTN_RED_STARTED < BTN_MEDIUM_LONG){
+    if (BTN_RED_PREV == LOW && BTN_RED == HIGH){
+        unsigned long ELAPSED_TIME = CURRENT_TIME - BTN_RED_STARTED;
+        if (ELAPSED_TIME < BTN_MEDIUM_LONG){
             BTN_RED_SHORT_PRESS = true;
-        } else if (millis() - BTN_RED_STARTED < BTN_LONG) {
+        } else if (ELAPSED_TIME < BTN_LONG) {
             BTN_RED_MEDIUM_PRESS = true;
         } else {
             BTN_RED_LONG_PRESS = true;
         }
+        ardprintf("RED ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
     }
 
     // assign values to old
