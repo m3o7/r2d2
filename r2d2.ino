@@ -1,15 +1,11 @@
-
-// END LIBRARY
-
 #include <PCM.h>
 #include "sounddata-r2d2-excited.h"
 #include "sounddata-r2d2-veryexcited.h"
-#include "sounddata-r2d2-cheerful.h"
 
 #define SPEAKER_PIN 3
-#define LED_WHITE 9
-#define LED_RED 8
-#define LED_BLUE 7
+#define LED_WHITE 8
+#define LED_RED 7
+#define LED_BLUE 6
 
 // audio jack
 #define AJ_BTN_BLUE 13
@@ -30,6 +26,9 @@ bool BTN_RED_SHORT_PRESS = false;
 bool BTN_RED_MEDIUM_PRESS = false;
 bool BTN_RED_LONG_PRESS = false;
 
+// pointer to current sound
+int CURRENT_R2D2_SOUND = 0;
+
 // define button press times
 unsigned long BTN_MEDIUM_LONG = 500;
 unsigned long BTN_LONG = 2000;
@@ -46,10 +45,6 @@ void setup(){
     // Audio-Jack controlled buttons
     pinMode(AJ_BTN_BLUE, INPUT_PULLUP);
     pinMode(AJ_BTN_RED, INPUT_PULLUP);
-
-    // playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
-    // playSound(sounddata_excited_data, sizeof(sounddata_excited_data), 2000);
-    // playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
 }
 
 void loop(){
@@ -58,24 +53,31 @@ void loop(){
 
     //print out the value of the pushbutton
     if (BTN_BLUE_SHORT_PRESS || BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS){
-        //ardprintf("blue: %d %d %d", BTN_BLUE_SHORT_PRESS, BTN_BLUE_MEDIUM_PRESS, BTN_BLUE_LONG_PRESS); // DEBUG ONLY
-        playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
+        play_next_sound();
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
-        //ardprintf("red: %d %d %d", BTN_RED_SHORT_PRESS, BTN_RED_MEDIUM_PRESS, BTN_RED_LONG_PRESS); // DEBUG ONLY
-        playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
+        flicker_leds();
+    }
+}
+
+void play_sound(const unsigned char soundData[], int size, int delay_ms) {
+    // Play a given sound
+    startPlayback(soundData, size);
+}
+
+void play_next_sound(){
+    // Play the next sound in the loop
+    if (CURRENT_R2D2_SOUND == 0){
+        play_sound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data));
+    } else {
+        play_sound(sounddata_excited_data, sizeof(sounddata_excited_data));
     }
 
-    // control_leds();
-
+    // update sound pointer
+    CURRENT_R2D2_SOUND = (CURRENT_R2D2_SOUND > 0) ? 0 : CURRENT_R2D2_SOUND+1; 
 }
 
-void playSound(const unsigned char soundData[], int size, int delay_ms) {
-    startPlayback(soundData, size);
-    delay(delay_ms); // pause, as the sound is asynchronously played
-}
-
-void control_leds(){
+void flicker_leds(){
     // control lights
     analogWrite(LED_WHITE, random(255));
     analogWrite(LED_RED, random(255));
