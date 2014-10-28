@@ -1,60 +1,10 @@
-/*LIBRARY*/
 
-#ifndef ARDPRINTF
-#define ARDPRINTF
-#define ARDBUFFER 16
-#include <stdarg.h>
-#include <Arduino.h>
+// END LIBRARY
 
-int ardprintf(char *str, ...)
-{
-  int i, count=0, j=0, flag=0;
-  char temp[ARDBUFFER+1];
-  for(i=0; str[i]!='\0';i++)  if(str[i]=='%')  count++;
-
-  va_list argv;
-  va_start(argv, count);
-  for(i=0,j=0; str[i]!='\0';i++)
-  {
-    if(str[i]=='%')
-    {
-      temp[j] = '\0';
-      Serial.print(temp);
-      j=0;
-      temp[0] = '\0';
-
-      switch(str[++i])
-      {
-        case 'd': Serial.print(va_arg(argv, int));
-                  break;
-        case 'l': Serial.print(va_arg(argv, long));
-                  break;
-        case 'f': Serial.print(va_arg(argv, double));
-                  break;
-        case 'c': Serial.print((char)va_arg(argv, int));
-                  break;
-        case 's': Serial.print(va_arg(argv, char *));
-                  break;
-        default:  ;
-      };
-    }
-    else 
-    {
-      temp[j] = str[i];
-      j = (j+1)%ARDBUFFER;
-      if(j==0) 
-      {
-        temp[ARDBUFFER] = '\0';
-        Serial.print(temp);
-        temp[0]='\0';
-      }
-    }
-  };
-  Serial.println();
-  return count + 1;
-}
-#undef ARDBUFFER
-#endif
+#include <PCM.h>
+#include "sounddata-r2d2-excited.h"
+#include "sounddata-r2d2-veryexcited.h"
+#include "sounddata-r2d2-cheerful.h"
 
 #define SPEAKER_PIN 3
 #define LED_WHITE 9
@@ -96,6 +46,10 @@ void setup(){
     // Audio-Jack controlled buttons
     pinMode(AJ_BTN_BLUE, INPUT_PULLUP);
     pinMode(AJ_BTN_RED, INPUT_PULLUP);
+
+    playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
+    playSound(sounddata_excited_data, sizeof(sounddata_excited_data), 2000);
+    playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
 }
 
 void loop(){
@@ -104,13 +58,19 @@ void loop(){
 
     //print out the value of the pushbutton
     if (BTN_BLUE_SHORT_PRESS || BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS){
-        ardprintf("blue: %d %d %d", BTN_BLUE_SHORT_PRESS, BTN_BLUE_MEDIUM_PRESS, BTN_BLUE_LONG_PRESS); // DEBUG ONLY
+        //ardprintf("blue: %d %d %d", BTN_BLUE_SHORT_PRESS, BTN_BLUE_MEDIUM_PRESS, BTN_BLUE_LONG_PRESS); // DEBUG ONLY
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
-        ardprintf("red: %d %d %d", BTN_RED_SHORT_PRESS, BTN_RED_MEDIUM_PRESS, BTN_RED_LONG_PRESS); // DEBUG ONLY
+        //ardprintf("red: %d %d %d", BTN_RED_SHORT_PRESS, BTN_RED_MEDIUM_PRESS, BTN_RED_LONG_PRESS); // DEBUG ONLY
     }
 
     // control_leds();
+
+}
+
+void playSound(const unsigned char soundData[], int size, int delay_ms) {
+    startPlayback(soundData, size);
+    delay(delay_ms); // pause, as the sound is asynchronously played
 }
 
 void control_leds(){
@@ -132,20 +92,20 @@ void read_buttons(){
     // read sensor values - http://arduino.cc/en/Tutorial/InputPullupSerial
     BTN_BLUE = digitalRead(AJ_BTN_BLUE);
     BTN_RED = digitalRead(AJ_BTN_RED);
-    // ardprintf("%d - %d", BTN_BLUE, BTN_RED); // DEBUG ONLY
+    // //ardprintf("%d - %d", BTN_BLUE, BTN_RED); // DEBUG ONLY
     unsigned long CURRENT_TIME = millis();
 
     // PRESS STARTED ===========================================================
     /*BLUE BTN press finished*/
     if (BTN_BLUE_PREV == HIGH && BTN_BLUE == LOW){ 
         BTN_BLUE_STARTED = CURRENT_TIME;
-        ardprintf("BLUE start %l", BTN_BLUE_STARTED); // DEBUG ONLY
+        //ardprintf("BLUE start %l", BTN_BLUE_STARTED); // DEBUG ONLY
     }
 
     /*RED BTN press finished*/
     if (BTN_RED_PREV == LOW && BTN_RED == HIGH){ 
         BTN_RED_STARTED = CURRENT_TIME;
-        ardprintf("RED start %l", BTN_RED_STARTED); // DEBUG ONLY
+        //ardprintf("RED start %l", BTN_RED_STARTED); // DEBUG ONLY
     }
 
     // PRESS FINISHED ==========================================================
@@ -159,7 +119,7 @@ void read_buttons(){
         } else {
             BTN_BLUE_LONG_PRESS = true;
         }
-        ardprintf("BLUE ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
+        //ardprintf("BLUE ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
     }
 
     /*RED BTN press finished*/
@@ -172,7 +132,7 @@ void read_buttons(){
         } else {
             BTN_RED_LONG_PRESS = true;
         }
-        ardprintf("RED ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
+        //ardprintf("RED ended: %l; %l", CURRENT_TIME, ELAPSED_TIME);
     }
 
     // assign values to old
