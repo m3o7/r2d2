@@ -1,8 +1,9 @@
 #include <PCM.h>
+#include "pitches.h"
 #include "sounddata-r2d2-excited.h"
 #include "sounddata-r2d2-veryexcited.h"
 
-#define SPEAKER_PIN 3
+#define SPEAKER_PIN 11
 #define LED_WHITE 8
 #define LED_RED 7
 #define LED_BLUE 6
@@ -33,6 +34,25 @@ int CURRENT_R2D2_SOUND = 0;
 unsigned long BTN_MEDIUM_LONG = 500;
 unsigned long BTN_LONG = 2000;
 
+// notes in the melody:
+int melody[] = {
+    NOTE_G4, NOTE_G4, NOTE_G4, NOTE_DS4, NOTE_AS4, NOTE_G4,  NOTE_DS4, NOTE_AS4, NOTE_G4,
+    NOTE_D5, NOTE_D5, NOTE_D5, NOTE_DS5, NOTE_AS4, NOTE_FS4, NOTE_DS4, NOTE_AS4, NOTE_G4,
+    NOTE_G5, NOTE_G4, NOTE_G4, NOTE_G5, NOTE_FS5, NOTE_F5, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_GS4, NOTE_CS5,
+    NOTE_C5, NOTE_B4, NOTE_AS4, NOTE_A4, NOTE_AS4, NOTE_DS4, NOTE_FS4,
+    NOTE_E4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_B4, NOTE_D5 
+};
+
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations[] = {
+    4, 4, 4, 8, 8, 4, 8, 8, 2,
+    4, 4, 4, 8, 8, 4, 8, 8, 2,
+    4, 8, 8, 4, 8, 8, 8, 8, 8, 8, 4,
+    8, 8, 8, 8, 8, 8, 4,
+    8, 8, 4, 8, 8, 2,
+
+};
+
 void setup(){
     // DEBUG ONLY - communication with computer
     Serial.begin(9600);
@@ -52,15 +72,18 @@ void loop(){
     read_buttons();    
 
     //print out the value of the pushbutton
-    if (BTN_BLUE_SHORT_PRESS || BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS){
+    if (BTN_BLUE_SHORT_PRESS){
         play_next_sound();
+    } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
+        play_melody();
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         flicker_leds();
+        // play_melody();
     }
 }
 
-void play_sound(const unsigned char soundData[], int size, int delay_ms) {
+void play_sound(const unsigned char soundData[], int size) {
     // Play a given sound
     startPlayback(soundData, size);
 }
@@ -75,6 +98,33 @@ void play_next_sound(){
 
     // update sound pointer
     CURRENT_R2D2_SOUND = (CURRENT_R2D2_SOUND > 0) ? 0 : CURRENT_R2D2_SOUND+1; 
+}
+
+void play_melody(){
+    // iterate over the notes of the melody:
+    stopPlayback();
+    int BTN_BLUE_TEMP;
+    for (int thisNote = 0; thisNote < (sizeof(melody)/sizeof(int)) - 1; thisNote++) {
+
+        // to calculate the note duration, take one second 
+        // divided by the note type.
+        //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+        int noteDuration = 1000/noteDurations[thisNote];
+        tone(SPEAKER_PIN, melody[thisNote],noteDuration);
+
+        // to distinguish the notes, set a minimum time between them.
+        // the note's duration + 30% seems to work well:
+        int pauseBetweenNotes = noteDuration * 1.30;
+        delay(pauseBetweenNotes);
+        // stop the tone playing:
+        noTone(SPEAKER_PIN);
+
+        BTN_BLUE_TEMP = digitalRead(AJ_BTN_BLUE);
+        if(BTN_BLUE_TEMP == LOW) {
+            // stop playback in case of a blue button press
+            break;
+        }
+    }
 }
 
 void flicker_leds(){
