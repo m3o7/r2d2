@@ -35,7 +35,7 @@ unsigned long BTN_MEDIUM_LONG = 500;
 unsigned long BTN_LONG = 2000;
 
 // notes in the melody:
-int melody[] = {
+int emperor[] = {
     NOTE_G3, NOTE_G3, NOTE_G3, NOTE_DS3, NOTE_AS3, NOTE_G3,  NOTE_DS3, NOTE_AS3, NOTE_G3,
     NOTE_D4, NOTE_D4, NOTE_D4, NOTE_DS4, NOTE_AS3, NOTE_FS3, NOTE_DS3, NOTE_AS3, NOTE_G3,
     NOTE_G4, NOTE_G3, NOTE_G3, NOTE_G4, NOTE_FS4, NOTE_F4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_GS3, NOTE_CS4,
@@ -44,7 +44,7 @@ int melody[] = {
 };
 
 // note durations: 4 = quarter note, 8 = eighth note, etc.:
-int noteDurations[] = {
+int emperorDuration[] = {
     4, 4, 4, 8, 8, 4, 8, 8, 2,
     4, 4, 4, 8, 8, 4, 8, 8, 2,
     4, 8, 8, 4, 8, 8, 8, 8, 8, 8, 4,
@@ -74,7 +74,7 @@ void loop(){
     if (BTN_BLUE_SHORT_PRESS){
         play_next_sound();
     } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
-        play_melody();
+        play_melody(emperor, sizeof(emperor), emperorDuration, 1200);
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         flicker_leds();
@@ -99,16 +99,16 @@ void play_next_sound(){
     CURRENT_R2D2_SOUND = (CURRENT_R2D2_SOUND > 0) ? 0 : CURRENT_R2D2_SOUND+1; 
 }
 
-void play_melody(){
+void play_melody(int melody[], int melodySize, int noteDurations[], int speed){
     // iterate over the notes of the melody:
     stopPlayback();
     int BTN_BLUE_TEMP;
-    for (int thisNote = 0; thisNote < (sizeof(melody)/sizeof(int)) - 1; thisNote++) {
+    for (int thisNote = 0; thisNote < (melodySize/sizeof(int)) - 1; thisNote++) {
 
         // to calculate the note duration, take one second 
         // divided by the note type.
         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-        int noteDuration = 1200/noteDurations[thisNote];
+        int noteDuration = speed/noteDurations[thisNote];
         tone(SPEAKER_PIN, melody[thisNote], noteDuration);
 
         // to distinguish the notes, set a minimum time between them.
@@ -117,7 +117,6 @@ void play_melody(){
         delay(pauseBetweenNotes);
         // stop the tone playing:
         noTone(SPEAKER_PIN);
-
 
         // stop playback in case of a blue button press
         BTN_BLUE_TEMP = digitalRead(AJ_BTN_BLUE);
