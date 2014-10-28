@@ -36,11 +36,11 @@ unsigned long BTN_LONG = 2000;
 
 // notes in the melody:
 int melody[] = {
-    NOTE_G4, NOTE_G4, NOTE_G4, NOTE_DS4, NOTE_AS4, NOTE_G4,  NOTE_DS4, NOTE_AS4, NOTE_G4,
-    NOTE_D5, NOTE_D5, NOTE_D5, NOTE_DS5, NOTE_AS4, NOTE_FS4, NOTE_DS4, NOTE_AS4, NOTE_G4,
-    NOTE_G5, NOTE_G4, NOTE_G4, NOTE_G5, NOTE_FS5, NOTE_F5, NOTE_E5, NOTE_DS5, NOTE_E5, NOTE_GS4, NOTE_CS5,
-    NOTE_C5, NOTE_B4, NOTE_AS4, NOTE_A4, NOTE_AS4, NOTE_DS4, NOTE_FS4,
-    NOTE_E4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_B4, NOTE_D5 
+    NOTE_G3, NOTE_G3, NOTE_G3, NOTE_DS3, NOTE_AS3, NOTE_G3,  NOTE_DS3, NOTE_AS3, NOTE_G3,
+    NOTE_D4, NOTE_D4, NOTE_D4, NOTE_DS4, NOTE_AS3, NOTE_FS3, NOTE_DS3, NOTE_AS3, NOTE_G3,
+    NOTE_G4, NOTE_G3, NOTE_G3, NOTE_G4, NOTE_FS4, NOTE_F4, NOTE_E4, NOTE_DS4, NOTE_E4, NOTE_GS3, NOTE_CS4,
+    NOTE_C4, NOTE_B3, NOTE_AS3, NOTE_A3, NOTE_AS3, NOTE_DS3, NOTE_FS3,
+    NOTE_E3, NOTE_G3, NOTE_AS3, NOTE_G3, NOTE_B3, NOTE_D4 
 };
 
 // note durations: 4 = quarter note, 8 = eighth note, etc.:
@@ -50,7 +50,6 @@ int noteDurations[] = {
     4, 8, 8, 4, 8, 8, 8, 8, 8, 8, 4,
     8, 8, 8, 8, 8, 8, 4,
     8, 8, 4, 8, 8, 2,
-
 };
 
 void setup(){
@@ -109,8 +108,8 @@ void play_melody(){
         // to calculate the note duration, take one second 
         // divided by the note type.
         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-        int noteDuration = 1000/noteDurations[thisNote];
-        tone(SPEAKER_PIN, melody[thisNote],noteDuration);
+        int noteDuration = 1200/noteDurations[thisNote];
+        tone(SPEAKER_PIN, melody[thisNote], noteDuration);
 
         // to distinguish the notes, set a minimum time between them.
         // the note's duration + 30% seems to work well:
@@ -119,9 +118,10 @@ void play_melody(){
         // stop the tone playing:
         noTone(SPEAKER_PIN);
 
+
+        // stop playback in case of a blue button press
         BTN_BLUE_TEMP = digitalRead(AJ_BTN_BLUE);
         if(BTN_BLUE_TEMP == LOW) {
-            // stop playback in case of a blue button press
             break;
         }
     }
