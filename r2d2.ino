@@ -47,9 +47,9 @@ void setup(){
     pinMode(AJ_BTN_BLUE, INPUT_PULLUP);
     pinMode(AJ_BTN_RED, INPUT_PULLUP);
 
-    playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
-    playSound(sounddata_excited_data, sizeof(sounddata_excited_data), 2000);
-    playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
+    // playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
+    // playSound(sounddata_excited_data, sizeof(sounddata_excited_data), 2000);
+    // playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
 }
 
 void loop(){
@@ -59,9 +59,11 @@ void loop(){
     //print out the value of the pushbutton
     if (BTN_BLUE_SHORT_PRESS || BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS){
         //ardprintf("blue: %d %d %d", BTN_BLUE_SHORT_PRESS, BTN_BLUE_MEDIUM_PRESS, BTN_BLUE_LONG_PRESS); // DEBUG ONLY
+        playSound(sounddata_veryexcited_data, sizeof(sounddata_veryexcited_data), 2000);
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         //ardprintf("red: %d %d %d", BTN_RED_SHORT_PRESS, BTN_RED_MEDIUM_PRESS, BTN_RED_LONG_PRESS); // DEBUG ONLY
+        playSound(sounddata_cheerful_data, sizeof(sounddata_cheerful_data), 2000);
     }
 
     // control_leds();
