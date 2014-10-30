@@ -36,6 +36,7 @@ bool BTN_RED_LONG_PRESS = false;
 
 // pointer to current sound
 int CURRENT_R2D2_SOUND = 0;
+int CURRENT_SONG = 0;
 
 // define button press times
 unsigned long BTN_MEDIUM_LONG = 500;
@@ -65,8 +66,7 @@ void loop(){
     if (BTN_BLUE_SHORT_PRESS){
         play_next_sound();
     } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
-        play_melody(emperor, sizeof(emperor), emperorDuration, 1800);
-        // play_melody(starwars, sizeof(starwars), starwarsDuration, 1600);
+        play_next_song();
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         set_next_light_mode();
@@ -81,6 +81,17 @@ void set_next_light_mode(){
     if (!LIGHTMODE){
         play_off_sound();
     }
+}
+
+void play_next_song() {
+    if (CURRENT_SONG == 0){
+        play_melody(emperor, sizeof(emperor), emperorDuration, 1800);
+    } else {
+        play_melody(starwars, sizeof(starwars), starwarsDuration, 1600);
+    }
+    
+    // update song pointer
+    CURRENT_SONG = (CURRENT_SONG > 0) ? 0 : CURRENT_SONG+1; 
 }
 
 void play_off_sound(){
