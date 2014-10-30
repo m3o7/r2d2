@@ -1,8 +1,13 @@
 // notes in the melody:
 int emperor[] = {
-    N_A4, N_R,  N_A4, N_R, N_A4, N_R, N_F4, N_R, N_C5, N_R, N_A4, N_R, N_F4, N_R, N_C5, N_R, N_A4, N_R, N_E5, N_R, N_E5, N_R, N_E5, N_R, N_F5, N_R, N_C5, N_R, N_G5, N_R, N_F5, N_R, N_C5, N_R, N_A4, N_R
+    N_G3, N_G3, N_G3, N_DS3, N_AS3, N_G3, N_DS3, N_AS3, N_G3,
+    N_D4, N_D4, N_D4, N_DS4, N_AS3, N_FS3, N_DS3, N_AS3, N_G3,
+    N_G4, N_G3, N_G3, N_G4, N_FS4, N_F4, N_E4, N_DS4, N_E4, N_GS3, N_CS4,
 };
 
 int emperorDuration[] = {
-    50, 20, 50, 20, 50, 20, 40, 5, 20, 5,  60, 10, 40, 5, 20, 5, 60, 80, 50, 20, 50, 20, 50, 20, 40, 5, 20, 5,  60, 10, 40, 5,  20, 5, 60, 40
+    8, 8, 8, 16, 16, 8, 16, 16, 4,
+    8, 8, 8, 16, 16, 8, 16, 16, 4,
+    8, 16, 16, 8, 16, 16, 32, 32, 16, 8, 4,
+
 };
