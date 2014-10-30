@@ -4,6 +4,7 @@
 #include "sounddata-r2d2-veryexcited.h"
 #include "cantina.h"
 #include "emperor.h"
+#include "starwars.h"
 
 #define SPEAKER_PIN 11
 #define LED_WHITE 8
@@ -66,7 +67,8 @@ void loop(){
         play_next_sound();
     } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
         // play_melody(emperor, sizeof(emperor), emperorDuration, 1200);
-        play_melody(cantina, sizeof(cantina), cantinaDuration, 1, 2.0);
+        // play_melody(cantina, sizeof(cantina), cantinaDuration, 1, 2.0);
+        play_melody(starwars, sizeof(starwars), starwarsDuration, 1400);
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         set_next_light_mode();
@@ -106,21 +108,21 @@ void play_next_sound(){
     CURRENT_R2D2_SOUND = (CURRENT_R2D2_SOUND > 0) ? 0 : CURRENT_R2D2_SOUND+1; 
 }
 
-void play_melody(int melody[], int melodySize, int noteDurations[], float speedFactor, float pauseFactor){
+void play_melody(int melody[], int melodySize, int noteDurations[], int speed){
     // iterate over the notes of the melody:
     stopPlayback(); // stop any PCM playback
     int BTN_BLUE_TEMP;
-    for (int thisNote = 0; thisNote < (melodySize/sizeof(int)) - 1; thisNote++) {
+    for (int thisNote = 0; thisNote < (melodySize/sizeof(int)); thisNote++) {
 
         // to calculate the note duration, take one second 
         // divided by the note type.
         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-        int noteDuration = noteDurations[thisNote] * speedFactor;
+        int noteDuration = speed/noteDurations[thisNote];
         tone(SPEAKER_PIN, melody[thisNote], noteDuration);
 
         // to distinguish the notes, set a minimum time between them.
         // the note's duration + 30% seems to work well:
-        int pauseBetweenNotes = noteDuration * pauseFactor;
+        int pauseBetweenNotes = noteDuration * 1.30;
         delay(pauseBetweenNotes);
         // stop the tone playing:
         noTone(SPEAKER_PIN);
