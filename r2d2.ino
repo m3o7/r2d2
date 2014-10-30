@@ -2,7 +2,6 @@
 #include "pitches.h"
 #include "sounddata-r2d2-excited.h"
 #include "sounddata-r2d2-veryexcited.h"
-#include "cantina.h"
 #include "emperor.h"
 #include "starwars.h"
 
@@ -66,9 +65,8 @@ void loop(){
     if (BTN_BLUE_SHORT_PRESS){
         play_next_sound();
     } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
-        // play_melody(emperor, sizeof(emperor), emperorDuration, 1200);
-        // play_melody(cantina, sizeof(cantina), cantinaDuration, 1, 2.0);
-        play_melody(starwars, sizeof(starwars), starwarsDuration, 1400);
+        play_melody(emperor, sizeof(emperor), emperorDuration, 1800);
+        // play_melody(starwars, sizeof(starwars), starwarsDuration, 1600);
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
         set_next_light_mode();
