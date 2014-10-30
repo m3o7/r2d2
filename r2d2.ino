@@ -77,6 +77,16 @@ void loop(){
 
 void set_next_light_mode(){
     LIGHTMODE = (LIGHTMODE > 1) ? 0 : LIGHTMODE+1;
+
+    if (!LIGHTMODE){
+        play_off_sound();
+    }
+}
+
+void play_off_sound(){
+    tone(SPEAKER_PIN, N_C3, 100);
+    delay(100);
+    noTone(SPEAKER_PIN);
 }
 
 void play_sound(const unsigned char soundData[], int size) {
@@ -146,16 +156,30 @@ void update_leds_off(){
     analogWrite(LED_BLUE, 0);
 }
 
+unsigned long LAST_UPDATE_WHITE = 0;
+int WHITE_UPDATE_INTERVAL = random(5000);
+int BLUE_UPDATE_VALUE = 10;
+int BLUE_SUM = 0;
 void update_leds_slow(){
-    analogWrite(LED_WHITE, random(255));
-    analogWrite(LED_RED, random(255));
-    analogWrite(LED_BLUE, random(255));
+    if (millis() - LAST_UPDATE_WHITE > WHITE_UPDATE_INTERVAL){
+        analogWrite(LED_WHITE, 127 + random(2));    // 127 - off
+        LAST_UPDATE_WHITE = millis();
+        WHITE_UPDATE_INTERVAL = random(5000);
+    }
+    
+    analogWrite(LED_RED, 128); // keep if always on      // 127 - off
+
+    // make blue LED glimmer slowly
+    analogWrite(LED_BLUE, BLUE_SUM);
+    BLUE_SUM = BLUE_SUM + BLUE_UPDATE_VALUE;
+    BLUE_UPDATE_VALUE = (BLUE_SUM > 254 || BLUE_SUM < 1) ? BLUE_UPDATE_VALUE * -1 : BLUE_UPDATE_VALUE;
+    BLUE_SUM = max(0, min(255, BLUE_SUM));
 }
 
 void update_leds_random(){
-    analogWrite(LED_WHITE, random(255));
-    analogWrite(LED_RED, random(255));
-    analogWrite(LED_BLUE, random(255));
+    analogWrite(LED_WHITE, 100+random(255));
+    analogWrite(LED_RED, 100+random(128));
+    analogWrite(LED_BLUE, random(128));
 }
 
 void read_buttons(){
