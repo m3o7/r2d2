@@ -14,6 +14,11 @@
 #define AJ_BTN_BLUE 13
 #define AJ_BTN_RED 12 
 
+// light modes
+#define OFF 0
+#define SLOW 1
+#define RANDOM 2
+
 // GLOBAL VARIABLES
 int BTN_BLUE = LOW;
 int BTN_BLUE_PREV = LOW;
@@ -35,6 +40,8 @@ int CURRENT_R2D2_SOUND = 0;
 // define button press times
 unsigned long BTN_MEDIUM_LONG = 500;
 unsigned long BTN_LONG = 2000;
+
+int LIGHTMODE = SLOW;
 
 void setup(){
     // DEBUG ONLY - communication with computer
@@ -58,12 +65,18 @@ void loop(){
     if (BTN_BLUE_SHORT_PRESS){
         play_next_sound();
     } else if (BTN_BLUE_MEDIUM_PRESS || BTN_BLUE_LONG_PRESS) {
-        //play_melody(emperor, sizeof(emperor), emperorDuration, 1200);
-        play_melody(cantina, sizeof(cantina), cantinaDuration, 500);
+        // play_melody(emperor, sizeof(emperor), emperorDuration, 1200);
+        play_melody(cantina, sizeof(cantina), cantinaDuration, 1, 2.0);
     }
     if (BTN_RED_SHORT_PRESS || BTN_RED_MEDIUM_PRESS || BTN_RED_LONG_PRESS){
-        flicker_leds();
+        set_next_light_mode();
     }
+
+    update_leds(); // once per run
+}
+
+void set_next_light_mode(){
+    LIGHTMODE = (LIGHTMODE > 1) ? 0 : LIGHTMODE+1;
 }
 
 void play_sound(const unsigned char soundData[], int size) {
@@ -83,21 +96,21 @@ void play_next_sound(){
     CURRENT_R2D2_SOUND = (CURRENT_R2D2_SOUND > 0) ? 0 : CURRENT_R2D2_SOUND+1; 
 }
 
-void play_melody(int melody[], int melodySize, int noteDurations[], int speed){
+void play_melody(int melody[], int melodySize, int noteDurations[], float speedFactor, float pauseFactor){
     // iterate over the notes of the melody:
-    stopPlayback();
+    stopPlayback(); // stop any PCM playback
     int BTN_BLUE_TEMP;
     for (int thisNote = 0; thisNote < (melodySize/sizeof(int)) - 1; thisNote++) {
 
         // to calculate the note duration, take one second 
         // divided by the note type.
         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-        int noteDuration = speed/noteDurations[thisNote];
+        int noteDuration = noteDurations[thisNote] * speedFactor;
         tone(SPEAKER_PIN, melody[thisNote], noteDuration);
 
         // to distinguish the notes, set a minimum time between them.
         // the note's duration + 30% seems to work well:
-        int pauseBetweenNotes = noteDuration * 1.30;
+        int pauseBetweenNotes = noteDuration * pauseFactor;
         delay(pauseBetweenNotes);
         // stop the tone playing:
         noTone(SPEAKER_PIN);
@@ -110,8 +123,36 @@ void play_melody(int melody[], int melodySize, int noteDurations[], int speed){
     }
 }
 
-void flicker_leds(){
+void update_leds(){
     // control lights
+    switch (LIGHTMODE){
+        case OFF:
+            update_leds_off();
+            break;
+        case SLOW:
+            update_leds_slow();
+            break;
+        case RANDOM:
+            update_leds_random();
+            break;
+        default:
+            update_leds_slow();
+    }
+}
+
+void update_leds_off(){
+    analogWrite(LED_WHITE, 0);
+    analogWrite(LED_RED, 0);
+    analogWrite(LED_BLUE, 0);
+}
+
+void update_leds_slow(){
+    analogWrite(LED_WHITE, random(255));
+    analogWrite(LED_RED, random(255));
+    analogWrite(LED_BLUE, random(255));
+}
+
+void update_leds_random(){
     analogWrite(LED_WHITE, random(255));
     analogWrite(LED_RED, random(255));
     analogWrite(LED_BLUE, random(255));
