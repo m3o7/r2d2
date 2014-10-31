@@ -3,7 +3,7 @@ R2D2 - A great arduino halloween custome
 ![r2d2](https://farm6.staticflickr.com/5602/15486311338_0a32776ddd.jpg)
 
 # the wiring
-Just a word of advice - We ended up using the **Arduino Uno R3**(ATmega328), instead of the **Leonardo**(ATMega32u4), which you can see in the pictures. This has to do with the ATMega32u4 chip-set used in the Leonardo and the currently available PCM-sound libraries. (check out this [link](http://forum.arduino.cc/index.php?topic=275063.0) for more information.)
+Just a word of advice - We ended up using the **Arduino Uno R3**(ATmega328), instead of the **Leonardo**(ATMega32u4), which you can see in the pictures. This has to do with the ATMega32u4 chip-set used in the Leonardo and the currently available PCM-sound libraries. (check out this [link](http://forum.arduino.cc/index.php?topic=275063.0) for more information.)  
 ![arduino](https://farm4.staticflickr.com/3943/15647976636_4c66fc4449.jpg)
 ![leds](https://farm6.staticflickr.com/5598/15052336143_66b7956249.jpg)
 ![speaker installation](https://farm8.staticflickr.com/7483/15486312398_683240b776.jpg)
