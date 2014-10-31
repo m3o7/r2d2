@@ -10,6 +10,8 @@ Just a word of advice - We ended up using the **Arduino Uno R3**(ATmega328), ins
 ![buttons](https://farm4.staticflickr.com/3950/15485813429_99aa73a45e.jpg)
 
 # coloring the helmet
+![airbrush](https://farm8.staticflickr.com/7571/15051744394_a11dff380a.jpg)
+![colors](https://farm4.staticflickr.com/3942/15486318568_818a62b03c.jpg)
 ![foundation](https://farm8.staticflickr.com/7531/15486318338_e6fee50f60.jpg)
 ![masking](https://farm8.staticflickr.com/7569/15486500047_e9ef41e4f3.jpg)
 ![blue plates](https://farm4.staticflickr.com/3946/15486902330_1be8db94d7.jpg)
