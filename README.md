@@ -7,6 +7,7 @@ Just a word of advice - We ended up using the **Arduino Uno R3**(ATmega328), ins
 ![arduino](https://farm4.staticflickr.com/3943/15647976636_4c66fc4449.jpg)
 ![leds](https://farm6.staticflickr.com/5598/15052336143_66b7956249.jpg)
 ![speaker installation](https://farm8.staticflickr.com/7483/15486312398_683240b776.jpg)
+![resistor board](https://farm4.staticflickr.com/3953/15058577793_f290b1c26b.jpg)
 ![buttons](https://farm4.staticflickr.com/3950/15485813429_99aa73a45e.jpg)
 
 # coloring the helmet
